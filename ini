@@ -1,0 +1,14 @@
+[all:vars]
+ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@160.44.204.91" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ansible_python_interpreter=/usr/bin/python3
+apiserver=192.168.10.5
+extern_apiserver=160.44.204.91
+[master]
+192.168.10.5
+[worker]
+192.168.10.188
+192.168.10.151
+192.168.10.95
+192.168.10.135
+192.168.10.13
+

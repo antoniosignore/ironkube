@@ -1,0 +1,20 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: ./ca.pem
+    server: https://80.158.6.158:6443
+  name: api
+contexts:
+- context:
+    cluster: api
+    namespace: kube-system
+    user: namespaceuser
+  name: api
+current-context: api
+kind: Config
+preferences: {}
+users:
+- name: namespaceuser
+  user:
+    client-certificate: ./cluster-admin.pem
+    client-key: ./cluster-admin-key.pem

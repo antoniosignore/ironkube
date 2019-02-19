@@ -1,0 +1,10 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: trader-ingress
+  annotations:
+      kubernetes.io/ingress.global-static-ip-name: "otc-host"
+spec:
+  backend:
+    serviceName: trader
+    servicePort: 8080
