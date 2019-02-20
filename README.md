@@ -1,3 +1,4 @@
+# BARE METAL Kubernetes cluster for OpenStack
 
 # Minimal Terraform OTC Example
 
@@ -177,7 +178,7 @@ EOF
 
 # PUT  Docker Hub secrets into develop namespace  to pull docker images from docker.hub
 
-kubectl create secret docker-registry regcred --docker-username=asignore --docker-password=ansi500urk36x --docker-email=ansi500urk36x -n develop
+kubectl create secret docker-registry regcred --docker-username=asignore --docker-password=********** --docker-email=***************** -n develop
 
 ## Istio
     cd istio-1.0.2
