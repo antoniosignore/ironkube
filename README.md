@@ -137,50 +137,51 @@ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW5
 
 # Create DEV, QA, PROD namespace (environment)
 
-cat <<EOF | kubectl create -f -
-{
-  "kind": "Namespace",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "develop",
-    "labels": {
-      "name": "develop"
+    cat <<EOF | kubectl create -f -
+    {
+      "kind": "Namespace",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "develop",
+        "labels": {
+          "name": "develop"
+        }
+      }
     }
-  }
-}
-EOF
+    EOF
 
-cat <<EOF | kubectl create -f -
-{
-  "kind": "Namespace",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "staging",
-    "labels": {
-      "name": "staging"
+    cat <<EOF | kubectl create -f -
+    {
+      "kind": "Namespace",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "staging",
+        "labels": {
+          "name": "staging"
+        }
+      }
     }
-  }
-}
-EOF
+    EOF
 
-cat <<EOF | kubectl create -f -
-{
-  "kind": "Namespace",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "production",
-    "labels": {
-      "name": "production"
+    cat <<EOF | kubectl create -f -
+    {
+      "kind": "Namespace",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "production",
+        "labels": {
+          "name": "production"
+        }
+      }
     }
-  }
-}
-EOF
+    EOF
 
 # PUT  Docker Hub secrets into develop namespace  to pull docker images from docker.hub
 
 kubectl create secret docker-registry regcred --docker-username=asignore --docker-password=********** --docker-email=***************** -n develop
 
 ## Istio
+
     cd istio-1.0.2
     helm install install/kubernetes/helm/istio --name istio --namespace istio-system
 
@@ -188,95 +189,95 @@ kubectl create secret docker-registry regcred --docker-username=asignore --docke
 
   kubectl label namespace develop istio-injection=enabled
 
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: Service
-metadata:
-  name: sentiment-analysis-web-app
-  labels:
-    app: sentiment-analysis-web-app
-spec:
-  ports:
-  - port: 80
-    name: http
-  selector:
-    app: sentiment-analysis-web-app
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: sentiment-analysis-web-app
-  namespace: develop
-spec:
-  replicas: 1
-  template:
+    cat <<EOF | kubectl create -f -
+    apiVersion: v1
+    kind: Service
     metadata:
+      name: sentiment-analysis-web-app
       labels:
         app: sentiment-analysis-web-app
     spec:
-      containers:
-      - name: private-reg-container-name
-        image: asignore/sentiment-analysis-web-app
-      imagePullSecrets:
-      - name: regcred
-EOF
+      ports:
+      - port: 80
+        name: http
+      selector:
+        app: sentiment-analysis-web-app
+    ---
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    metadata:
+      name: sentiment-analysis-web-app
+      namespace: develop
+    spec:
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: sentiment-analysis-web-app
+        spec:
+          containers:
+          - name: private-reg-container-name
+            image: asignore/sentiment-analysis-web-app
+          imagePullSecrets:
+          - name: regcred
+    EOF
 
 
 # Hello world in ISTIO dev environment
-cat <<EOF | kubectl create -f -
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  labels:
-    app: myhelloworld
-  name: myhelloworld
-spec:
-  replicas: 1
-  template:
+    cat <<EOF | kubectl create -f -
+    apiVersion: extensions/v1beta1
+    kind: Deployment
     metadata:
       labels:
         app: myhelloworld
+      name: myhelloworld
     spec:
-      containers:
-      - image: stevenc81/jaeger-tracing-example:0.1
-        imagePullPolicy: Always
-        name: myhelloworld
-        ports:
-        - containerPort: 8080
-      restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: myhelloworld
-  labels:
-    app: myhelloworld
-    namespace: dev
-spec:
-  type: NodePort
-  ports:
-  - port: 80
-    targetPort: 8080
-    name: http
-  selector:
-    app: myhelloworld
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: myhelloworld
-  annotations:
-    kubernetes.io/ingress.class: "istio"
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        backend:
-          serviceName: myhelloworld
-          servicePort: 80
-      - path: /gettime
-        backend:
-          serviceName: myhelloworld
-          servicePort: 8
-EOF
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: myhelloworld
+        spec:
+          containers:
+          - image: stevenc81/jaeger-tracing-example:0.1
+            imagePullPolicy: Always
+            name: myhelloworld
+            ports:
+            - containerPort: 8080
+          restartPolicy: Always
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: myhelloworld
+      labels:
+        app: myhelloworld
+        namespace: dev
+    spec:
+      type: NodePort
+      ports:
+      - port: 80
+        targetPort: 8080
+        name: http
+      selector:
+        app: myhelloworld
+    ---
+    apiVersion: extensions/v1beta1
+    kind: Ingress
+    metadata:
+      name: myhelloworld
+      annotations:
+        kubernetes.io/ingress.class: "istio"
+    spec:
+      rules:
+      - http:
+          paths:
+          - path: /
+            backend:
+              serviceName: myhelloworld
+              servicePort: 80
+          - path: /gettime
+            backend:
+              serviceName: myhelloworld
+              servicePort: 8
+    EOF
